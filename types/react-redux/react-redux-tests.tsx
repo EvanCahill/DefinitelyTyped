@@ -1473,3 +1473,18 @@ function testConnectReturnType() {
     const myHoc2 = <P, >(C: React.FC<P>): React.ComponentType<P> => C;
     myHoc2(Test);
 }
+
+function testChildren() {
+    // These props are necessary as there is some bug that allows passing
+    // children to to `React.FC<{}>` components.
+    const FunctionalComponent: React.FC<{ prop?: any }> = (props) => null;
+    class ClassComponent extends React.Component {}
+
+    const ConnectedFunctionalComponent = connect()(FunctionalComponent);
+    const ConnectedClassComponent = connect()(ClassComponent);
+
+    // Allow passing of children to connected class components
+    <ConnectedClassComponent>{'child'}</ConnectedClassComponent>;
+    // Functional components are required to explicitly declare children
+    <ConnectedFunctionalComponent>{'child'}</ConnectedFunctionalComponent>; // $ExpectError
+}
